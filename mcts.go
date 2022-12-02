@@ -16,7 +16,7 @@ type Action struct {
 type State interface {
 	getCurrentPlayer() int
 	getPossibleActions() []Action
-	takeAction(a Action) State
+	takeAction(a *Action) State
 	isTerminal() bool
 	getReward() int
 }
@@ -46,7 +46,7 @@ func (s *NaughtsAndCrossesState) getPossibleActions() []Action {
 	return possibleActions
 }
 
-func (s *NaughtsAndCrossesState) takeAction(a Action) *NaughtsAndCrossesState {
+func (s *NaughtsAndCrossesState) takeAction(a *Action) *NaughtsAndCrossesState {
 	newState := *initNaughtsAndCrossesState()
 	for i, row := range s.board {
 		copy(newState.board[i], row)
@@ -150,7 +150,7 @@ func (s *NaughtsAndCrossesState) getReward() int {
 
 // 	action := Action{1, 0, 0}
 // 	action1 := Action{1, 0, 0}
-// 	newState := state.takeAction(action)
+// 	newState := state.takeAction(&action)
 // 	fmt.Println(state)
 // 	fmt.Println(newState)
 // 	set := map[Action]int{}
@@ -171,7 +171,7 @@ func randomPolicy(state *NaughtsAndCrossesState) int {
 	for !state.isTerminal() {
 		actions := state.getPossibleActions()
 		action := actions[rand.Intn(len(actions))]
-		state = state.takeAction(action)
+		state = state.takeAction(&action)
 	}
 	return state.getReward()
 }
@@ -270,7 +270,7 @@ func (self *MCTS) expand(node *TreeNode) *TreeNode {
 	actions := node.state.getPossibleActions()
 	for _, action := range actions {
 		if _, ok := node.children[action]; !ok {
-			newNode := initTreeNode(node.state.takeAction(action), node)
+			newNode := initTreeNode(node.state.takeAction(&action), node)
 			node.children[action] = newNode
 			if len(actions) == len(node.children) {
 				node.isFullyExpanded = true
