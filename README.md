@@ -5,9 +5,7 @@ More than 20 times faster than the [Python implementation](https://github.com/pb
 
 ## How to Use
 
-1. Provide a custom environment
-
-Implement all methods of the `State` interface. Specifically:
+1. Provide a custom environment. Implement all methods of the `State` interface. Specifically,
 
 ```go
 type State interface {
@@ -21,14 +19,16 @@ type State interface {
 
 where `action` can be any hashable type. We provide example environments under `env/`.
 
-2. Search for the best action given the current state
-
-An example using the toy environment:
+2. Search for the best action given the current state. You can define a custom rollout policy or use the default random one. Below is an example with the toy environment.
 ```go
 import (
   "github.com/Zacchaeus14/MCTS"
   "github.com/Zacchaeus14/MCTS/policy"
+  "math"
 )
+initialState := NewNaughtsAndCrossesState()
+searcher := MCTS.NewMCTS(1000, 0, 1.0/math.Sqrt(2), policy.RandomPolicy) // limit search time to one second
+bestAction := searcher.Search(initialState) // {1, 1, 1}
 ```
 
 ## TODO
