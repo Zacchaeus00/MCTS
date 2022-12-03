@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Action struct {
+type NaughtsAndCrossesAction struct {
 	player int
 	x      int
 	y      int
@@ -15,8 +15,8 @@ type Action struct {
 
 type State interface {
 	getCurrentPlayer() int
-	getPossibleActions() []Action
-	takeAction(a *Action) State
+	getPossibleActions() []any
+	takeAction(a any) State
 	isTerminal() bool
 	getReward() int
 }
@@ -34,24 +34,25 @@ func (s *NaughtsAndCrossesState) getCurrentPlayer() int {
 	return s.currentPlayer
 }
 
-func (s *NaughtsAndCrossesState) getPossibleActions() []Action {
-	possibleActions := []Action{}
+func (s *NaughtsAndCrossesState) getPossibleActions() []any {
+	possibleActions := []any{}
 	for i := range s.board {
 		for j := range s.board[i] {
 			if s.board[i][j] == 0 {
-				possibleActions = append(possibleActions, Action{s.currentPlayer, i, j})
+				possibleActions = append(possibleActions, NaughtsAndCrossesAction{s.currentPlayer, i, j})
 			}
 		}
 	}
 	return possibleActions
 }
 
-func (s *NaughtsAndCrossesState) takeAction(a *Action) State {
+func (s *NaughtsAndCrossesState) takeAction(a any) State {
 	newState := initNaughtsAndCrossesState()
 	for i, row := range s.board {
 		copy(newState.board[i], row)
 	}
-	newState.board[a.x][a.y] = a.player
+	ncAction := a.(NaughtsAndCrossesAction)
+	newState.board[ncAction.x][ncAction.y] = ncAction.player
 	newState.currentPlayer = -s.currentPlayer
 	return newState
 }
@@ -171,7 +172,7 @@ func randomPolicy(state State) int {
 	for !state.isTerminal() {
 		actions := state.getPossibleActions()
 		action := actions[rand.Intn(len(actions))]
-		state = state.takeAction(&action)
+		state = state.takeAction(action)
 	}
 	return state.getReward()
 }
@@ -183,7 +184,7 @@ type TreeNode struct {
 	parent          *TreeNode
 	numVisits       int
 	totalReward     int
-	children        map[Action]*TreeNode
+	children        map[any]*TreeNode
 }
 
 func initTreeNode(state State, parent *TreeNode) *TreeNode {
@@ -192,7 +193,7 @@ func initTreeNode(state State, parent *TreeNode) *TreeNode {
 	node.isTerminal = state.isTerminal()
 	node.isFullyExpanded = node.isTerminal
 	node.parent = parent
-	node.children = map[Action]*TreeNode{}
+	node.children = map[any]*TreeNode{}
 	return &node
 }
 
@@ -227,7 +228,7 @@ func initMCTS(timeLimit int, iterationLimit int, explorationConstant float64, ro
 	return &mcts
 }
 
-func (self *MCTS) search(initialState State) Action {
+func (self *MCTS) search(initialState State) any {
 	self.root = initTreeNode(initialState, nil)
 	if self.limitType == "time" {
 		timeLimit := time.Now().UnixNano()/1000000 + int64(self.timeLimit)
@@ -270,7 +271,7 @@ func (self *MCTS) expand(node *TreeNode) *TreeNode {
 	actions := node.state.getPossibleActions()
 	for _, action := range actions {
 		if _, ok := node.children[action]; !ok {
-			newNode := initTreeNode(node.state.takeAction(&action), node)
+			newNode := initTreeNode(node.state.takeAction(action), node)
 			node.children[action] = newNode
 			if len(actions) == len(node.children) {
 				node.isFullyExpanded = true
