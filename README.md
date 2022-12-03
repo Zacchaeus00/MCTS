@@ -11,11 +11,13 @@ Implement all methods of the `State` interface. Specifically,
 type State interface {
   GetCurrentPlayer() int
   GetPossibleActions() []any
-  TakeAction(a any) State
+  TakeAction(action any) State
   IsTerminal() bool
   GetReward() int
 }
 ```
+
+where `action` can be any hashable type.
 
 ## TODO
 - [X] Modularization
