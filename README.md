@@ -5,7 +5,9 @@ More than 20 times faster than the [Python implementation](https://github.com/pb
 
 ## How to Use
 
-Implement all methods of the `State` interface. Specifically,
+1. Provide a custom environment
+
+Implement all methods of the `State` interface. Specifically:
 
 ```go
 type State interface {
@@ -17,7 +19,17 @@ type State interface {
 }
 ```
 
-where `action` can be any hashable type.
+where `action` can be any hashable type. We provide example environments under `env/`.
+
+2. Search for the best action given the current state
+
+An example using the toy environment:
+```go
+import (
+  "github.com/Zacchaeus14/MCTS"
+  "github.com/Zacchaeus14/MCTS/policy"
+)
+```
 
 ## TODO
 - [X] Modularization
