@@ -7,13 +7,15 @@ More than 20 times faster than the [Python implementation](https://github.com/pb
 
 Implement all methods of the `State` interface. Specifically,
 
-  type State interface {
-    GetCurrentPlayer() int
-    GetPossibleActions() []any
-    TakeAction(a any) State
-    IsTerminal() bool
-    GetReward() int
-  }
+```go
+type State interface {
+  GetCurrentPlayer() int
+  GetPossibleActions() []any
+  TakeAction(a any) State
+  IsTerminal() bool
+  GetReward() int
+}
+```
 
 ## TODO
 - [X] Modularization
