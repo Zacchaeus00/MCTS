@@ -46,14 +46,14 @@ func (s *NaughtsAndCrossesState) getPossibleActions() []Action {
 	return possibleActions
 }
 
-func (s *NaughtsAndCrossesState) takeAction(a *Action) *NaughtsAndCrossesState {
-	newState := *initNaughtsAndCrossesState()
+func (s *NaughtsAndCrossesState) takeAction(a *Action) State {
+	newState := initNaughtsAndCrossesState()
 	for i, row := range s.board {
 		copy(newState.board[i], row)
 	}
 	newState.board[a.x][a.y] = a.player
 	newState.currentPlayer = -s.currentPlayer
-	return &newState
+	return newState
 }
 
 func abs(n int) int {
@@ -167,7 +167,7 @@ func (s *NaughtsAndCrossesState) getReward() int {
 // 	fmt.Println(tState3.isTerminal())
 // }
 
-func randomPolicy(state *NaughtsAndCrossesState) int {
+func randomPolicy(state State) int {
 	for !state.isTerminal() {
 		actions := state.getPossibleActions()
 		action := actions[rand.Intn(len(actions))]
@@ -177,7 +177,7 @@ func randomPolicy(state *NaughtsAndCrossesState) int {
 }
 
 type TreeNode struct {
-	state           NaughtsAndCrossesState
+	state           State
 	isTerminal      bool
 	isFullyExpanded bool
 	parent          *TreeNode
@@ -186,9 +186,9 @@ type TreeNode struct {
 	children        map[Action]*TreeNode
 }
 
-func initTreeNode(state *NaughtsAndCrossesState, parent *TreeNode) *TreeNode {
+func initTreeNode(state State, parent *TreeNode) *TreeNode {
 	node := TreeNode{}
-	node.state = *state
+	node.state = state
 	node.isTerminal = state.isTerminal()
 	node.isFullyExpanded = node.isTerminal
 	node.parent = parent
@@ -196,7 +196,7 @@ func initTreeNode(state *NaughtsAndCrossesState, parent *TreeNode) *TreeNode {
 	return &node
 }
 
-type rollout_t func(*NaughtsAndCrossesState) int
+type rollout_t func(State) int
 
 type MCTS struct {
 	timeLimit           int
@@ -227,7 +227,7 @@ func initMCTS(timeLimit int, iterationLimit int, explorationConstant float64, ro
 	return &mcts
 }
 
-func (self *MCTS) search(initialState *NaughtsAndCrossesState) Action {
+func (self *MCTS) search(initialState State) Action {
 	self.root = initTreeNode(initialState, nil)
 	if self.limitType == "time" {
 		timeLimit := time.Now().UnixNano()/1000000 + int64(self.timeLimit)
@@ -251,7 +251,7 @@ func (self *MCTS) search(initialState *NaughtsAndCrossesState) Action {
 
 func (self *MCTS) executeRound() {
 	node := self.selectNode(self.root)
-	reward := self.rollout(&node.state)
+	reward := self.rollout(node.state)
 	self.backpropogate(node, reward)
 }
 
