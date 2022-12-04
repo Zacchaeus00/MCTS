@@ -8,11 +8,11 @@ import (
 	"testing"
 )
 
-func TestNewState(t *testing.T) {
+func TestNewNCState(t *testing.T) {
 	NewNaughtsAndCrossesState()
 }
 
-func TestTerminal(t *testing.T) {
+func TestNCTerminal(t *testing.T) {
 	tState := NaughtsAndCrossesState{[][]int{{1, 1, 1}, {0, 0, 0}, {0, 0, 0}}, 1}
 	if !tState.IsTerminal() {
 		t.Fatalf("%v should be terminal state", tState)
@@ -31,7 +31,7 @@ func TestTerminal(t *testing.T) {
 	}
 }
 
-func TestMCTS(t *testing.T) {
+func TestNCMCTS(t *testing.T) {
 	initialState := NewNaughtsAndCrossesState()
 	searcher := MCTS.NewMCTS(1000, 0, 1/math.Sqrt(2), policy.ParallelRandomPolicy, 10)
 	bestAction := searcher.Search(initialState, true).(NaughtsAndCrossesAction)
