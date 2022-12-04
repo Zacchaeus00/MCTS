@@ -15,7 +15,7 @@ func TestNewC4State(t *testing.T) {
 func TestC4MCTS(t *testing.T) {
 	initialState := NewConnect4StateState()
 	searcher := MCTS.NewMCTS(1000, 0, 10, policy.ParallelRandomPolicy, 10)
-	bestAction := searcher.Search(initialState, true).(Connect4Action)
+	bestAction := searcher.Search(initialState, 2).(Connect4Action)
 	targetAction := Connect4Action{1, 3}
 	if bestAction != targetAction {
 		t.Fatalf("Best action should be %v, but has %v", targetAction, bestAction)

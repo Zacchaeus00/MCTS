@@ -3,14 +3,14 @@ package env
 import "github.com/Zacchaeus14/MCTS"
 
 type NaughtsAndCrossesAction struct {
-	player int
-	x      int
-	y      int
+	Player int
+	X      int
+	Y      int
 }
 
 type NaughtsAndCrossesState struct {
-	board         [][]int
-	currentPlayer int
+	Board         [][]int
+	CurrentPlayer int
 }
 
 func NewNaughtsAndCrossesState() *NaughtsAndCrossesState {
@@ -18,15 +18,15 @@ func NewNaughtsAndCrossesState() *NaughtsAndCrossesState {
 }
 
 func (s *NaughtsAndCrossesState) GetCurrentPlayer() int {
-	return s.currentPlayer
+	return s.CurrentPlayer
 }
 
 func (s *NaughtsAndCrossesState) GetPossibleActions() []any {
 	possibleActions := []any{}
-	for i := range s.board {
-		for j := range s.board[i] {
-			if s.board[i][j] == 0 {
-				possibleActions = append(possibleActions, NaughtsAndCrossesAction{s.currentPlayer, i, j})
+	for i := range s.Board {
+		for j := range s.Board[i] {
+			if s.Board[i][j] == 0 {
+				possibleActions = append(possibleActions, NaughtsAndCrossesAction{s.CurrentPlayer, i, j})
 			}
 		}
 	}
@@ -35,12 +35,12 @@ func (s *NaughtsAndCrossesState) GetPossibleActions() []any {
 
 func (s *NaughtsAndCrossesState) TakeAction(a any) MCTS.State {
 	newState := NewNaughtsAndCrossesState()
-	for i, row := range s.board {
-		copy(newState.board[i], row)
+	for i, row := range s.Board {
+		copy(newState.Board[i], row)
 	}
 	ncAction := a.(NaughtsAndCrossesAction)
-	newState.board[ncAction.x][ncAction.y] = ncAction.player
-	newState.currentPlayer = -s.currentPlayer
+	newState.Board[ncAction.X][ncAction.Y] = ncAction.Player
+	newState.CurrentPlayer = -s.CurrentPlayer
 	return newState
 }
 
@@ -52,7 +52,7 @@ func abs(n int) int {
 }
 func (s *NaughtsAndCrossesState) IsTerminal() bool {
 	sum := 0
-	for _, row := range s.board {
+	for _, row := range s.Board {
 		sum = 0
 		for _, e := range row {
 			sum += e
@@ -61,30 +61,30 @@ func (s *NaughtsAndCrossesState) IsTerminal() bool {
 			return true
 		}
 	}
-	for j := range s.board[0] {
+	for j := range s.Board[0] {
 		sum = 0
-		for i := range s.board {
-			sum += s.board[i][j]
+		for i := range s.Board {
+			sum += s.Board[i][j]
 		}
 		if abs(sum) == 3 {
 			return true
 		}
 	}
 	sum = 0
-	for i := range s.board {
-		sum += s.board[i][i]
+	for i := range s.Board {
+		sum += s.Board[i][i]
 	}
 	if abs(sum) == 3 {
 		return true
 	}
 	sum = 0
-	for i := range s.board {
-		sum += s.board[i][len(s.board)-i-1]
+	for i := range s.Board {
+		sum += s.Board[i][len(s.Board)-i-1]
 	}
 	if abs(sum) == 3 {
 		return true
 	}
-	for _, row := range s.board {
+	for _, row := range s.Board {
 		for _, e := range row {
 			if e == 0 {
 				return false
@@ -96,7 +96,7 @@ func (s *NaughtsAndCrossesState) IsTerminal() bool {
 
 func (s *NaughtsAndCrossesState) GetReward() int {
 	sum := 0
-	for _, row := range s.board {
+	for _, row := range s.Board {
 		sum = 0
 		for _, e := range row {
 			sum += e
@@ -105,25 +105,25 @@ func (s *NaughtsAndCrossesState) GetReward() int {
 			return sum / 3
 		}
 	}
-	for j := range s.board[0] {
+	for j := range s.Board[0] {
 		sum = 0
-		for i := range s.board {
-			sum += s.board[i][j]
+		for i := range s.Board {
+			sum += s.Board[i][j]
 		}
 		if abs(sum) == 3 {
 			return sum / 3
 		}
 	}
 	sum = 0
-	for i := range s.board {
-		sum += s.board[i][i]
+	for i := range s.Board {
+		sum += s.Board[i][i]
 	}
 	if abs(sum) == 3 {
 		return sum / 3
 	}
 	sum = 0
-	for i := range s.board {
-		sum += s.board[i][len(s.board)-i-1]
+	for i := range s.Board {
+		sum += s.Board[i][len(s.Board)-i-1]
 	}
 	if abs(sum) == 3 {
 		return sum / 3

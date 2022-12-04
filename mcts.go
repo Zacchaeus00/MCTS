@@ -66,7 +66,7 @@ func NewMCTS(timeLimit int, iterationLimit int, explorationConstant float64, rol
 	return &mcts
 }
 
-func (mcts *MCTS) Search(initialState State, verbose bool) any {
+func (mcts *MCTS) Search(initialState State, verbose int) any {
 	mcts.Root = NewTreeNode(initialState, nil)
 	if mcts.LimitType == "time" {
 		timeLimit := time.Now().UnixNano()/1000000 + int64(mcts.TimeLimit)
@@ -80,13 +80,16 @@ func (mcts *MCTS) Search(initialState State, verbose bool) any {
 	}
 	bestChild := mcts.getBestChild(mcts.Root, 0)
 	bestMeanReward := getMeanReward(bestChild)
-	if verbose {
+	if verbose == 2 {
 		for action, child := range mcts.Root.Children {
 			fmt.Printf("Action: %v\t%.2f%% Visits\t%.3f%% Wins\n", action, 100*float64(child.NumVisits)/float64(mcts.Root.NumVisits), 100*(float64(child.TotalReward)/float64(child.NumVisits)+1)/2)
 		}
 	}
 	for action, child := range mcts.Root.Children {
 		if getMeanReward(child) == bestMeanReward {
+			if verbose == 1 {
+				fmt.Printf("Action: %v\t%.2f%% Visits\t%.3f%% Wins\n", action, 100*float64(child.NumVisits)/float64(mcts.Root.NumVisits), 100*(float64(child.TotalReward)/float64(child.NumVisits)+1)/2)
+			}
 			return action
 		}
 	}

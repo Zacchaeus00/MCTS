@@ -3,34 +3,34 @@ package env
 import "github.com/Zacchaeus14/MCTS"
 
 type Connect4Action struct {
-	player int
-	x      int
+	Player int
+	X      int
 }
 
 type Connect4State struct {
-	board         [][]int
-	currentPlayer int
+	Board         [][]int
+	CurrentPlayer int
 }
 
 func NewConnect4StateState() *Connect4State {
 	state := Connect4State{}
-	state.board = make([][]int, 6)
+	state.Board = make([][]int, 6)
 	for i := 0; i < 6; i++ {
-		state.board[i] = make([]int, 7)
+		state.Board[i] = make([]int, 7)
 	}
-	state.currentPlayer = 1
+	state.CurrentPlayer = 1
 	return &state
 }
 
 func (s *Connect4State) GetCurrentPlayer() int {
-	return s.currentPlayer
+	return s.CurrentPlayer
 }
 
 func (s *Connect4State) GetPossibleActions() []any {
 	possibleActions := []any{}
-	for j, e := range s.board[0] {
+	for j, e := range s.Board[0] {
 		if e == 0 {
-			possibleActions = append(possibleActions, Connect4Action{s.currentPlayer, j})
+			possibleActions = append(possibleActions, Connect4Action{s.CurrentPlayer, j})
 		}
 	}
 	return possibleActions
@@ -38,17 +38,17 @@ func (s *Connect4State) GetPossibleActions() []any {
 
 func (s *Connect4State) TakeAction(a any) MCTS.State {
 	newState := NewConnect4StateState()
-	for i, row := range s.board {
-		copy(newState.board[i], row)
+	for i, row := range s.Board {
+		copy(newState.Board[i], row)
 	}
 	c4Action := a.(Connect4Action)
 	for i := 5; i >= 0; i-- {
-		if newState.board[i][c4Action.x] == 0 {
-			newState.board[i][c4Action.x] = c4Action.player
+		if newState.Board[i][c4Action.X] == 0 {
+			newState.Board[i][c4Action.X] = c4Action.Player
 			break
 		}
 	}
-	newState.currentPlayer = -s.currentPlayer
+	newState.CurrentPlayer = -s.CurrentPlayer
 	return newState
 }
 
@@ -70,7 +70,7 @@ func (s *Connect4State) GetReward() int {
 }
 
 func (s *Connect4State) checkFull() bool {
-	for _, row := range s.board {
+	for _, row := range s.Board {
 		for _, e := range row {
 			if e == 0 {
 				return false
@@ -81,11 +81,11 @@ func (s *Connect4State) checkFull() bool {
 }
 
 func (s *Connect4State) checkWin(player int) bool {
-	h, w := len(s.board), len(s.board[0])
+	h, w := len(s.Board), len(s.Board[0])
 	// horizontalCheck
 	for j := 0; j < w-3; j++ {
 		for i := 0; i < h; i++ {
-			if s.board[i][j] == player && s.board[i][j+1] == player && s.board[i][j+2] == player && s.board[i][j+3] == player {
+			if s.Board[i][j] == player && s.Board[i][j+1] == player && s.Board[i][j+2] == player && s.Board[i][j+3] == player {
 				return true
 			}
 		}
@@ -93,7 +93,7 @@ func (s *Connect4State) checkWin(player int) bool {
 	// verticalCheck
 	for i := 0; i < h-3; i++ {
 		for j := 0; j < w; j++ {
-			if s.board[i][j] == player && s.board[i+1][j] == player && s.board[i+2][j] == player && s.board[i+3][j] == player {
+			if s.Board[i][j] == player && s.Board[i+1][j] == player && s.Board[i+2][j] == player && s.Board[i+3][j] == player {
 				return true
 			}
 		}
@@ -101,7 +101,7 @@ func (s *Connect4State) checkWin(player int) bool {
 	// ascendingDiagonalCheck
 	for i := 3; i < h; i++ {
 		for j := 0; j < w-3; j++ {
-			if s.board[i][j] == player && s.board[i-1][j+1] == player && s.board[i-2][j+2] == player && s.board[i-3][j+3] == player {
+			if s.Board[i][j] == player && s.Board[i-1][j+1] == player && s.Board[i-2][j+2] == player && s.Board[i-3][j+3] == player {
 				return true
 			}
 		}
@@ -109,7 +109,7 @@ func (s *Connect4State) checkWin(player int) bool {
 	// descendingDiagonalCheck
 	for i := 3; i < h; i++ {
 		for j := 3; j < w; j++ {
-			if s.board[i][j] == player && s.board[i-1][j-1] == player && s.board[i-2][j-2] == player && s.board[i-3][j-3] == player {
+			if s.Board[i][j] == player && s.Board[i-1][j-1] == player && s.Board[i-2][j-2] == player && s.Board[i-3][j-3] == player {
 				return true
 			}
 		}
