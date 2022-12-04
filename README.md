@@ -31,4 +31,4 @@ bestAction := searcher.Search(initialState) // {1, 1, 1}
 
 ## TODO
 - [X] Modularization
-- [ ] Parallel rollout
+- [X] Parallel rollout
