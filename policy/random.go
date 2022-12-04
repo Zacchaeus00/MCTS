@@ -13,3 +13,12 @@ func RandomPolicy(state MCTS.State) int {
 	}
 	return state.GetReward()
 }
+
+func ParallelRandomPolicy(state MCTS.State, c chan int) {
+	for !state.IsTerminal() {
+		actions := state.GetPossibleActions()
+		action := actions[rand.Intn(len(actions))]
+		state = state.TakeAction(action)
+	}
+	c <- state.GetReward()
+}

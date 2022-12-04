@@ -1,6 +1,7 @@
 package MCTS
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -39,11 +40,12 @@ type MCTS struct {
 	IterationLimit      int
 	LimitType           string
 	ExplorationConstant float64
-	Rollout             func(State) int
+	Rollout             func(State, chan int)
 	Root                *TreeNode
+	Jobs                int
 }
 
-func NewMCTS(timeLimit int, iterationLimit int, explorationConstant float64, rollout func(State) int) *MCTS {
+func NewMCTS(timeLimit int, iterationLimit int, explorationConstant float64, rollout func(State, chan int), Jobs int) *MCTS {
 	mcts := MCTS{}
 	if timeLimit > 0 {
 		if iterationLimit > 0 {
@@ -60,10 +62,11 @@ func NewMCTS(timeLimit int, iterationLimit int, explorationConstant float64, rol
 	}
 	mcts.ExplorationConstant = explorationConstant
 	mcts.Rollout = rollout
+	mcts.Jobs = Jobs
 	return &mcts
 }
 
-func (mcts *MCTS) Search(initialState State) any {
+func (mcts *MCTS) Search(initialState State, verbose bool) any {
 	mcts.Root = NewTreeNode(initialState, nil)
 	if mcts.LimitType == "time" {
 		timeLimit := time.Now().UnixNano()/1000000 + int64(mcts.TimeLimit)
@@ -77,6 +80,11 @@ func (mcts *MCTS) Search(initialState State) any {
 	}
 	bestChild := mcts.getBestChild(mcts.Root, 0)
 	bestMeanReward := getMeanReward(bestChild)
+	if verbose {
+		for action, child := range mcts.Root.Children {
+			fmt.Printf("Action: %v\t%.2f%% Visits\t%.3f%% Wins\n", action, 100*float64(child.NumVisits)/float64(mcts.Root.NumVisits), 100*(float64(child.TotalReward)/float64(child.NumVisits)+1)/2)
+		}
+	}
 	for action, child := range mcts.Root.Children {
 		if getMeanReward(child) == bestMeanReward {
 			return action
@@ -87,7 +95,14 @@ func (mcts *MCTS) Search(initialState State) any {
 
 func (mcts *MCTS) executeRound() {
 	node := mcts.selectNode(mcts.Root)
-	reward := mcts.Rollout(node.State)
+	reward := 0
+	ch := make(chan int)
+	for i := 0; i < mcts.Jobs; i++ {
+		go mcts.Rollout(node.State, ch)
+	}
+	for i := 0; i < mcts.Jobs; i++ {
+		reward += <-ch
+	}
 	mcts.backpropogate(node, reward)
 }
 
@@ -119,7 +134,7 @@ func (mcts *MCTS) expand(node *TreeNode) *TreeNode {
 
 func (mcts *MCTS) backpropogate(node *TreeNode, reward int) {
 	for node != nil {
-		node.NumVisits++
+		node.NumVisits += mcts.Jobs
 		node.TotalReward += reward
 		node = node.Parent
 	}
