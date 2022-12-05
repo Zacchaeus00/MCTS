@@ -8,7 +8,8 @@ import (
 )
 
 func printBoard(board [][]int) {
-	for _, row := range board {
+	for i, row := range board {
+		print(i, "\t")
 		for _, e := range row {
 			msg := "_"
 			if e == 1 {
@@ -21,6 +22,7 @@ func printBoard(board [][]int) {
 		}
 		println()
 	}
+	print("\t")
 	for i := range board[0] {
 		print(i, "\t")
 	}
@@ -29,7 +31,7 @@ func printBoard(board [][]int) {
 
 func pve() {
 	var state MCTS.State
-	state = env.NewConnect4State()
+	state = env.NewGomokuState()
 
 	var first string
 	fmt.Print("go first (y/n): ")
@@ -43,16 +45,22 @@ func pve() {
 	}
 
 	for !state.IsTerminal() {
-		printBoard(state.(*env.Connect4State).Board)
+		printBoard(state.(*env.GomokuState).Board)
 		x := 0
+		y := 0
 		fmt.Print("input x: ")
 		fmt.Scan(&x)
-		state = state.TakeAction(env.Connect4Action{player, x})
-		searcher := MCTS.NewMCTS(1000, 0, 10, policy.ParallelRandomPolicy, 10)
+		fmt.Print("input y: ")
+		fmt.Scan(&y)
+		state = state.TakeAction(env.GomokuAction{Player: player, X: x, Y: y})
+		if state.IsTerminal() {
+			break
+		}
+		searcher := MCTS.NewMCTS(3000, 0, 1, policy.ParallelRandomPolicy, 10)
 		bestAction := searcher.Search(state, 1)
 		state = state.TakeAction(bestAction)
 	}
-	printBoard(state.(*env.Connect4State).Board)
+	printBoard(state.(*env.GomokuState).Board)
 }
 
 func selfPlay(n int) {

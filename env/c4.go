@@ -12,7 +12,7 @@ type Connect4State struct {
 	CurrentPlayer int
 }
 
-func NewConnect4StateState() *Connect4State {
+func NewConnect4State() *Connect4State {
 	state := Connect4State{}
 	state.Board = make([][]int, 6)
 	for i := 0; i < 6; i++ {
@@ -37,7 +37,7 @@ func (s *Connect4State) GetPossibleActions() []any {
 }
 
 func (s *Connect4State) TakeAction(a any) MCTS.State {
-	newState := NewConnect4StateState()
+	newState := NewConnect4State()
 	for i, row := range s.Board {
 		copy(newState.Board[i], row)
 	}

@@ -8,12 +8,12 @@ import (
 )
 
 func TestNewC4State(t *testing.T) {
-	state := NewConnect4StateState()
+	state := NewConnect4State()
 	fmt.Println(state)
 }
 
 func TestC4MCTS(t *testing.T) {
-	initialState := NewConnect4StateState()
+	initialState := NewConnect4State()
 	searcher := MCTS.NewMCTS(1000, 0, 10, policy.ParallelRandomPolicy, 10)
 	bestAction := searcher.Search(initialState, 2).(Connect4Action)
 	targetAction := Connect4Action{1, 3}
