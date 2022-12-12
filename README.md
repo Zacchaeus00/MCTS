@@ -1,7 +1,7 @@
 # MCTS
 An efficient Go implemetation of the Monte Carlo Tree Search algorithm with a friendly interface
 
-20 times faster than the [Python implementation](https://github.com/pbsinclair42/MCTS) by Paul Sinclair et al on single core, and even faster on multiple core
+20 times faster than the [Python implementation](https://github.com/pbsinclair42/MCTS) by Paul Sinclair et al on single core, and even faster on multiple cores with Goroutines
 
 ## How to Use
 
